@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta http-equiv="x-ua-compatible" content="ie=edge">
+        <title>ShipChart | {{title}}</title>
+
+        <!-- <link rel="shortcut icon" href="/static/resources/logo/favicon.ico" type="image/x-icon"> -->
+
+        <!-- libs -->
+        <link href="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+        <link rel="stylesheet" href="/static/css/app.css">
+        <link rel="stylesheet" href="/static/css/reset.css">
+        <link rel="stylesheet" href="/static/css/utils.css">
+        {% block special_styles %}
+
+        {% endblock %}
+    </head>
+
+    <body class="mdc-typography">
+        {% block base_content %}
+
+        {% endblock %}
+        <!--<script src="/static/libs/jquery/jquery.min.js"></script>-->
+        <script src="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.js"></script>
+        <script src="/static/js/app.js"></script>
+        {% block special_scripts %}
+
+        {% endblock %}
+    </body>
+</html>

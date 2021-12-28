@@ -1,0 +1,46 @@
+{% extends 'card.html' %}
+
+{% block content %}
+    <div class="ml-auto mr-auto form-wrapper">
+        <form class="mdc-card form-card" method="POST">
+            <h4 class="mdc-typography--headline4 mb-4">Sign In</h4>
+            <div class="mdc-theme--text-secondary-on-light mb-4 mt-0">ShipChart administration interface</div>
+            <label class="mdc-text-field mdc-text-field--filled mdc-text-field--with-leading-icon mb-4" data-mdc-auto-init="MDCTextField">
+                <i class="material-icons mdc-text-field__icon mdc-text-field__icon--leading">account_circle</i>
+                <span class="mdc-text-field__ripple"></span>
+                <span class="mdc-floating-label" id="login-label-id">Username</span>
+                <input class="mdc-text-field__input" type="text" aria-labelledby="login-label-id" name="login">
+                <span class="mdc-line-ripple"></span>
+            </label>
+            <label class="mdc-text-field mdc-text-field--filled mdc-text-field--with-leading-icon mb-4" data-mdc-auto-init="MDCTextField">
+                <i class="material-icons mdc-text-field__icon mdc-text-field__icon--leading">vpn_key</i>
+                <span class="mdc-text-field__ripple"></span>
+                <span class="mdc-floating-label" id="password-label-id">Password</span>
+                <input class="mdc-text-field__input" type="password" aria-labelledby="password-label-id" name="password">
+                <span class="mdc-line-ripple"></span>
+            </label>
+            <div class="d-flex">
+                <button class="mdc-button mdc-button--raised ml-auto" data-mdc-auto-init="MDCRipple" type="submit">
+                    <span class="mdc-button__ripple"></span>
+                    <span class="mdc-button__label">Sign In</span>
+                </button>
+            </div>
+            <input type="hidden" name="redirect_url" value="{% if redirect_url %}{{ redirect_url }}{% endif %}">
+        </form>
+    </div>
+
+    <aside id="errorsSnackbar" class="mdc-snackbar" data-mdc-auto-init="MDCSnackbar" data-errors="{{ has_error }}">
+        <div class="mdc-snackbar__surface" role="status" aria-relevant="additions">
+            <div class="mdc-snackbar__label" aria-atomic="false">
+                {{ errors }}
+            </div>
+            <div class="mdc-snackbar__actions" aria-atomic="true">
+                <button type="button" class="mdc-button mdc-snackbar__action" data-mdc-auto-init="MDCRipple">
+                    <div class="mdc-button__ripple"></div>
+                    <span class="mdc-button__label">Dismiss</span>
+                </button>
+            </div>
+        </div>
+    </aside>
+{% endblock %}
+

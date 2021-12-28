@@ -1,0 +1,6 @@
+{
+    "host": "localhost",
+    "user":"root",
+    "password": "password",
+    "db": "ship_chart"
+}

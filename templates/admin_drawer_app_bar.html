@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+
+{% block special_styles %}
+    <link rel="stylesheet" href="/static/css/drawer_app_bar.css">
+{% endblock %}
+
+{% block base_content %}
+    <header class="mdc-top-app-bar">
+        <div class="mdc-top-app-bar__row">
+            <section class="mdc-top-app-bar__section mdc-top-app-bar__section--align-start">
+                <span class="mdc-top-app-bar__title"><a href="/" class="mdc-theme--on-primary">Ship Chart</a> | {{ title }}</span>
+            </section>
+            <section class="mdc-top-app-bar__section mdc-top-app-bar__section--align-end" role="toolbar">
+                {% if session['user_id'] %}
+                    <a href="{{ url_for('auth.logout') }}" class="material-icons mdc-top-app-bar__action-item mdc-icon-button" aria-label="Person" data-mdc-auto-init="MDCRipple">
+                        <div class="mdc-icon-button__ripple"></div>
+                        logout
+                    </a>
+                {% else %}
+                    <a href="{{ url_for('auth.index') }}" class="material-icons mdc-top-app-bar__action-item mdc-icon-button" aria-label="Person" data-mdc-auto-init="MDCRipple">
+                        <div class="mdc-icon-button__ripple"></div>
+                        person
+                    </a>
+                {% endif %}
+            </section>
+        </div>
+    </header>
+    <main class="mdc-top-app-bar--fixed-adjust drawer-wrapper">
+        <aside class="mdc-drawer h-auto">
+            <div class="mdc-drawer__content">
+                <h6 class="mdc-typography--headline6 m-3 mb-4">Pages</h6>
+                <nav class="mdc-list" data-mdc-auto-init="MDCList">
+                    <a class="mdc-deprecated-list-item {% if page == 'ships' %} mdc-deprecated-list-item--activated {% endif %}" data-mdc-auto-init="MDCRipple" href="{% if page != 'ships' %}/ships{% else %}#{% endif %}">
+                        <span class="mdc-deprecated-list-item__ripple"></span>
+                        <i class="material-icons mdc-deprecated-list-item__graphic" aria-hidden="true">sailing</i>
+                        <span class="mdc-deprecated-list-item__text">Ships</span>
+                    </a>
+                    <a class="mdc-deprecated-list-item" data-mdc-auto-init="MDCRipple" href="#">
+                        <span class="mdc-deprecated-list-item__ripple"></span>
+                        <i class="material-icons mdc-deprecated-list-item__graphic" aria-hidden="true">people</i>
+                        <span class="mdc-deprecated-list-item__text">Staff</span>
+                    </a>
+                    <a class="mdc-deprecated-list-item" data-mdc-auto-init="MDCRipple" href="#">
+                        <span class="mdc-deprecated-list-item__ripple"></span>
+                        <i class="material-icons mdc-deprecated-list-item__graphic" aria-hidden="true">local_shipping</i>
+                        <span class="mdc-deprecated-list-item__text">Offloads</span>
+                    </a>
+                    <a class="mdc-deprecated-list-item" data-mdc-auto-init="MDCRipple" href="#">
+                        <span class="mdc-deprecated-list-item__ripple"></span>
+                        <i class="material-icons mdc-deprecated-list-item__graphic" aria-hidden="true">work</i>
+                        <span class="mdc-deprecated-list-item__text">Works</span>
+                    </a>
+                    <div class="divider-full"></div>
+                    <a class="mdc-deprecated-list-item" data-mdc-auto-init="MDCRipple" href="#">
+                        <span class="mdc-deprecated-list-item__ripple"></span>
+                        <i class="material-icons mdc-deprecated-list-item__graphic" aria-hidden="true">admin_panel_settings</i>
+                        <span class="mdc-deprecated-list-item__text">Administration</span>
+                    </a>
+                </nav>
+            </div>
+        </aside>
+        <div class="drawer-content-inner">
+            <div class="overlay">
+                {% block content %}
+
+                {% endblock %}
+            </div>
+        </div>
+    </main>
+{% endblock %}

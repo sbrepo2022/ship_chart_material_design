@@ -1,0 +1,40 @@
+{% extends 'app_bar.html' %}
+
+{% block content %}
+    <div class="mdc-layout-grid">
+        <div class="mdc-layout-grid__inner">
+            <div class="mdc-layout-grid__cell">
+                <div class="mdc-card">
+                    <div class="mdc-card__primary-action" data-mdc-auto-init="MDCRipple">
+                        <div class="mdc-card__media mdc-card__media--16-9" style="background-image: url('/static/resources/images/ship_bg.jpg')">
+                            <a href="{{ url_for('ships.index') }}" class="mdc-card__media-content"></a>
+                        </div>
+                        <div class="mdc-card__ripple"></div>
+                    </div>
+                    <div class="mdc-card__content">
+                        <div class="mdc-typography--headline6">Admin interface</div>
+                    </div>
+                    <div class="mdc-card__actions">
+                        <div class="mdc-card__action-buttons">
+                            <a href="{{ url_for('ships.index') }}" class="mdc-button mdc-card__action mdc-card__action--button" data-mdc-auto-init="MDCRipple">
+                                <div class="mdc-button__ripple"></div>
+                                <span class="mdc-button__label">Go Page</span>
+                            </a>
+                        </div>
+                        <!--<div class="mdc-card__action-icons">
+                            <button class="material-icons mdc-icon-button mdc-card__action mdc-card__action--icon" title="Share" data-mdc-auto-init="MDCRipple">
+                                <div class="mdc-icon-button__ripple"></div>
+                                share
+                            </button>
+                            <button class="material-icons mdc-icon-button mdc-card__action mdc-card__action--icon" title="More options" data-mdc-auto-init="MDCRipple">
+                                <div class="mdc-icon-button__ripple"></div>
+                                more_vert
+                            </button>
+                        </div>-->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+

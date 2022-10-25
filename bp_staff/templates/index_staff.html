@@ -1,0 +1,296 @@
+{% extends 'admin_drawer_app_bar.html' %}
+
+{% block special_styles %}
+    <link rel="stylesheet" href="/static/css/drawer_app_bar.css">
+    <link rel="stylesheet" href="/static/css/staff.css">
+{% endblock %}
+
+{% block content %}
+    <div class="mdc-layout-grid">
+        <div class="mdc-layout-grid__inner">
+
+            <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-10-desktop">
+                <div class="mdc-list-group">
+                    <h3 class="mdc-list-group__subheader">Working employees</h3>
+                    <ul class="mdc-deprecated-list mdc-deprecated-list--two-line mdc-deprecated-list--avatar-list" data-mdc-auto-init="MDCList">
+                        {% for employee in staff %}
+                            <li class="mdc-deprecated-list-item" tabindex="0" data-mdc-auto-init="MDCRipple"
+                                role="edit-employee"
+                                data-employee-id="{{ employee[0] }}"
+                                data-employee-firstname="{{ employee[1] }}"
+                                data-employee-lastname="{{ employee[2] }}"
+                                data-employee-midname="{{ employee[3] }}"
+                                data-employee-birthday="{{ employee[4] }}"
+                                data-employee-admission="{{ employee[5] }}"
+                                data-employee-dismissal="{{ employee[6] }}"
+                                data-department-id="{{ employee[7] }}"
+                                data-employee-image="{{ employee[8] }}"
+                            >
+                                <span class="mdc-deprecated-list-item__ripple"></span>
+                                <span class="mdc-deprecated-list-item__graphic material-icons"
+                                    {% if employee[8] != '' %}
+                                        style="background-size: cover; background-image: url({{ url_for('uploaded_file', filename=employee[8]) }})"
+                                    {% endif %}
+                                    {% if employee[8] == '' %}
+                                        style="background-size: cover; background-image: url('/static/resources/icons/account_circle.svg')"
+                                    {% endif %}
+                                >
+                                </span>
+                                <span class="mdc-deprecated-list-item__text">
+                                    <span class="mdc-deprecated-list-item__primary-text">{{ employee[1] }} {{ employee[3] }} {{ employee[2] }}</span>
+                                    <span class="mdc-deprecated-list-item__secondary-text">Department #{{ employee[7] }}</span>
+                                </span>
+                                <span class="mdc-deprecated-list-item__meta">
+                                    {% if employee[6] %}
+                                        <span class="mdc-theme--secondary">Dismissal date: {{ employee[6] }}</span>
+                                    {% endif %}
+                                    <button type="button" class="mdc-button mdc-theme--error ml-4" data-mdc-auto-init="MDCRipple" role="dismiss-employee" data-employee-id="{{ employee[0] }}" data-employee-dismissal="{{ employee[6] }}">
+                                        <div class="mdc-button__ripple"></div>
+                                        <span class="mdc-button__label">Dismiss</span>
+                                    </button>
+                                </span>
+                            </li>
+                            {% if not loop.last %}
+                                <li role="separator" class="mdc-deprecated-list-divider mdc-deprecated-list-divider--padding"></li>
+                            {% endif %}
+                        {% endfor %}
+                    </ul>
+
+                    <h3 class="mdc-list-group__subheader">Dismissed employees</h3>
+                    <ul class="mdc-deprecated-list mdc-deprecated-list--two-line mdc-deprecated-list--avatar-list" data-mdc-auto-init="MDCList">
+                        {% for employee in dismissed %}
+                            <li class="mdc-deprecated-list-item" tabindex="0" data-mdc-auto-init="MDCRipple"
+                                role="edit-employee"
+                                data-employee-id="{{ employee[0] }}"
+                                data-employee-firstname="{{ employee[1] }}"
+                                data-employee-lastname="{{ employee[2] }}"
+                                data-employee-midname="{{ employee[3] }}"
+                                data-employee-birthday="{{ employee[4] }}"
+                                data-employee-admission="{{ employee[5] }}"
+                                data-employee-dismissal="{{ employee[6] }}"
+                                data-department-id="{{ employee[7] }}"
+                                data-employee-image="{{ employee[8] }}"
+                            >
+                                <span class="mdc-deprecated-list-item__ripple"></span>
+                                <span class="mdc-deprecated-list-item__graphic material-icons"
+                                    {% if employee[8] != '' %}
+                                        style="background-size: cover; background-image: url({{ url_for('uploaded_file', filename=employee[8]) }})"
+                                    {% endif %}
+                                    {% if employee[8] == '' %}
+                                        style="background-size: cover; background-image: url('/static/resources/icons/account_circle.svg')"
+                                    {% endif %}
+                                >
+                                </span>
+                                <span class="mdc-deprecated-list-item__text">
+                                    <span class="mdc-deprecated-list-item__primary-text mdc-theme--text-disabled-on-background">{{ employee[1] }} {{ employee[3] }} {{ employee[2] }}</span>
+                                    <span class="mdc-deprecated-list-item__secondary-text mdc-theme--text-disabled-on-background">Department #{{ employee[7] }}</span>
+                                </span>
+                                <span class="mdc-deprecated-list-item__meta">
+                                    <button type="button" class="mdc-button" data-mdc-auto-init="MDCRipple" role="restore-employee" data-action="{{ url_for('staff.restore') }}" data-method="post" data-employee-id="{{ employee[0] }}">
+                                        <div class="mdc-button__ripple"></div>
+                                        <span class="mdc-button__label">Restore</span>
+                                    </button>
+                                    <button type="button" class="mdc-button mdc-theme--error" data-mdc-auto-init="MDCRipple" role="delete-employee" data-action="{{ url_for('staff.employee') }}" data-method="delete" data-employee-id="{{ employee[0] }}">
+                                        <div class="mdc-button__ripple"></div>
+                                        <span class="mdc-button__label">Delete</span>
+                                    </button>
+                                </span>
+                            </li>
+                            {% if not loop.last %}
+                                <li role="separator" class="mdc-deprecated-list-divider mdc-deprecated-list-divider--padding"></li>
+                            {% endif %}
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <button id="addEmployee" type="button" class="mdc-fab mdc-fab--extended fab-main" data-mdc-auto-init="MDCRipple">
+        <div class="mdc-fab__ripple"></div>
+        <span class="material-icons mdc-fab__icon">add</span>
+        <span class="mdc-fab__label">Add employee</span>
+    </button>
+
+
+    <form id="employeeForm" action="{{ url_for('staff.employee') }}">
+        <div id="employeeDialog" class="mdc-dialog mdc-dialog--fullscreen">
+            <div class="mdc-dialog__container">
+                <div class="mdc-dialog__surface app-dialog-surface overflow-none"
+                     role="dialog"
+                     aria-modal="true"
+                     aria-labelledby="employee-dialog-title"
+                     aria-describedby="employee-dialog-content">
+                    <div class="mdc-dialog__header">
+                        <h2 class="mdc-dialog__title" id="employee-dialog-title">
+                            Full-Screen Dialog Title
+                        </h2>
+                        <button type="button" class="mdc-icon-button material-icons mdc-dialog__close" data-mdc-dialog-action="close">
+                            close
+                        </button>
+                    </div>
+                    <div class="mdc-dialog__content overflow-auto" id="employee-dialog-content">
+                        <input id="employeeIdInput" type="hidden" name="employee-id">
+                        <div class="position-relative d-flex mb-5">
+                            <div class="card-avatar-bg-img-wrapper">
+                                <div id="employeeImgBg" class="card-avatar-bg-img" style="background-image: url('/static/resources/icons/account_circle.svg')"></div>
+                            </div>
+                            <div class="card-avatar-preview m-auto mb-5 mt-5">
+                                <div class="ratio-1-1">
+                                    <div class="ratio-inner">
+                                        <div id="employeeImgDisplay" class="card-avatar-image" style="background-image: url('/static/resources/icons/account_circle.svg')"></div>
+                                        <button id="chooseEmployeeImg" type="button" class="mdc-fab fab-context-avatar" data-mdc-auto-init="MDCRipple">
+                                            <div class="mdc-fab__ripple"></div>
+                                            <span class="material-icons mdc-fab__icon">edit</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <input id="employeeImgInput" class="d-none" type="file" name="employee-image">
+                        <div id="employeeDismissalComponentDialog" class="d-flex flex-align-center mb-4">
+                            <span class="material-icons mdc-theme--error align-middle">notification_important</span>
+                            <span id="employeeDismissalData" class="align-middle"></span>
+                            <button type="button" id="employeeRestoreButton" class="mdc-button ml-4" data-mdc-auto-init="MDCRipple" role="restore-employee" data-action="{{ url_for('staff.restore') }}" data-method="post" data-employee-id="">
+                                <div class="mdc-button__ripple"></div>
+                                <span class="mdc-button__label">Restore</span>
+                            </button>
+                        </div>
+                        <div class="d-flex flex-align-center mb-4">
+                            <label id="employeeAdmissionComponent" class="mdc-text-field mdc-text-field--filled mdc-text-field--with-leading-icon flex-grow-1" data-mdc-auto-init="MDCTextField">
+                                <i class="material-icons mdc-text-field__icon mdc-text-field__icon--leading">event</i>
+                                <span class="mdc-text-field__ripple"></span>
+                                <span class="mdc-floating-label" id="login-label-id">Admission date</span>
+                                <input class="mdc-text-field__input" id="employeeAdmissionInput" type="date" name="employee-admission">
+                                <span class="mdc-line-ripple"></span>
+                            </label>
+                            <button type="button" role="admission-today" class="mdc-button mdc-button--raised ml-4" data-mdc-auto-init="MDCRipple">
+                                <div class="mdc-button__ripple"></div>
+                                <span class="mdc-button__label">Today</span>
+                            </button>
+                        </div>
+                        <label id="employeeFirstnameComponent" class="mdc-text-field mdc-text-field--filled w-100 mb-4" data-mdc-auto-init="MDCTextField">
+                            <span class="mdc-text-field__ripple"></span>
+                            <span class="mdc-floating-label" id="login-label-id">Firstname</span>
+                            <input class="mdc-text-field__input" id="employeeFirstnameInput" type="text" name="employee-firstname">
+                            <span class="mdc-line-ripple"></span>
+                        </label>
+                        <label id="employeeMidnameComponent" class="mdc-text-field mdc-text-field--filled w-100 mb-4" data-mdc-auto-init="MDCTextField">
+                            <span class="mdc-text-field__ripple"></span>
+                            <span class="mdc-floating-label" id="login-label-id">Midname</span>
+                            <input class="mdc-text-field__input" id="employeeMidnameInput" type="text" name="employee-midname">
+                            <span class="mdc-line-ripple"></span>
+                        </label>
+                        <label id="employeeLastnameComponent" class="mdc-text-field mdc-text-field--filled w-100 mb-4" data-mdc-auto-init="MDCTextField">
+                            <span class="mdc-text-field__ripple"></span>
+                            <span class="mdc-floating-label" id="login-label-id">Lastname</span>
+                            <input class="mdc-text-field__input" id="employeeLastnameInput" type="text" name="employee-lastname">
+                            <span class="mdc-line-ripple"></span>
+                        </label>
+                        <label id="employeeBirthdayComponent" class="mdc-text-field mdc-text-field--filled mdc-text-field--with-leading-icon w-100 mb-4" data-mdc-auto-init="MDCTextField">
+                            <i class="material-icons mdc-text-field__icon mdc-text-field__icon--leading">event</i>
+                            <span class="mdc-text-field__ripple"></span>
+                            <span class="mdc-floating-label" id="login-label-id">Birthday</span>
+                            <input class="mdc-text-field__input" id="employeeBirthdayInput" type="date" name="employee-birthday">
+                            <span class="mdc-line-ripple"></span>
+                        </label>
+                        <label id="departmentIdComponent" class="mdc-text-field mdc-text-field--filled w-100 mb-4" data-mdc-auto-init="MDCTextField">
+                            <span class="mdc-text-field__ripple"></span>
+                            <span class="mdc-floating-label" id="login-label-id">Department ID</span>
+                            <input class="mdc-text-field__input" id="departmentIdInput" type="number" name="department-id">
+                            <span class="mdc-line-ripple"></span>
+                        </label>
+                    </div>
+                    <div class="mdc-dialog__actions">
+                        <button type="button" class="mdc-button mdc-dialog__button" data-mdc-dialog-action="cancel" data-mdc-auto-init="MDCRipple">
+                            <div class="mdc-button__ripple"></div>
+                            <span class="mdc-button__label">Cancel</span>
+                        </button>
+                        <button type="submit" class="mdc-button mdc-dialog__button" data-mdc-dialog-action="accept" data-mdc-auto-init="MDCRipple">
+                            <div class="mdc-button__ripple"></div>
+                            <span class="mdc-button__label">Accept</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="mdc-dialog__scrim"></div>
+        </div>
+    </form>
+
+
+    <form id="dismissForm" action="{{ url_for('staff.dismiss') }}" method="post">
+        <div id="dismissDialog" class="mdc-dialog mdc-dialog--fullscreen">
+            <div class="mdc-dialog__container">
+                <div class="mdc-dialog__surface app-dialog-surface overflow-none"
+                     role="dialog"
+                     aria-modal="true"
+                     aria-labelledby="dismiss-dialog-title"
+                     aria-describedby="dismiss-dialog-content">
+                    <div class="mdc-dialog__header">
+                        <h2 class="mdc-dialog__title" id="dismiss-dialog-title">
+                            Dismiss employee
+                        </h2>
+                        <button type="button" class="mdc-icon-button material-icons mdc-dialog__close" data-mdc-dialog-action="close">
+                            close
+                        </button>
+                    </div>
+                    <div class="mdc-dialog__content overflow-auto" id="dismiss-dialog-content">
+                        <input id="employeeDismissIdInput" type="hidden" name="employee-id">
+                        <div id="employeeDismissalComponentDialog2" class="d-flex flex-align-center mb-4">
+                            <span class="material-icons mdc-theme--error align-middle">notification_important</span>
+                            <span id="employeeDismissalData2" class="align-middle"></span>
+                            <button type="button" id="employeeRestoreButton2" class="mdc-button ml-4" data-mdc-auto-init="MDCRipple" role="restore-employee" data-action="{{ url_for('staff.restore') }}" data-method="post" data-employee-id="">
+                                <div class="mdc-button__ripple"></div>
+                                <span class="mdc-button__label">Restore</span>
+                            </button>
+                        </div>
+                        <div class="d-flex flex-align-center mb-4">
+                            <label id="employeeDismissalComponent" class="mdc-text-field mdc-text-field--filled mdc-text-field--with-leading-icon flex-grow-1" data-mdc-auto-init="MDCTextField">
+                                <i class="material-icons mdc-text-field__icon mdc-text-field__icon--leading">event</i>
+                                <span class="mdc-text-field__ripple"></span>
+                                <span class="mdc-floating-label" id="login-label-id">Dismissal date</span>
+                                <input class="mdc-text-field__input" id="employeeDismissalInput" type="date" name="employee-dismissal">
+                                <span class="mdc-line-ripple"></span>
+                            </label>
+                            <button type="button" role="dismissal-today" class="mdc-button mdc-button--raised ml-4" data-mdc-auto-init="MDCRipple">
+                                <div class="mdc-button__ripple"></div>
+                                <span class="mdc-button__label">Today</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="mdc-dialog__actions">
+                        <button type="button" class="mdc-button mdc-dialog__button" data-mdc-dialog-action="cancel" data-mdc-auto-init="MDCRipple">
+                            <div class="mdc-button__ripple"></div>
+                            <span class="mdc-button__label">Cancel</span>
+                        </button>
+                        <button type="submit" class="mdc-button mdc-dialog__button" data-mdc-dialog-action="accept" data-mdc-auto-init="MDCRipple">
+                            <div class="mdc-button__ripple"></div>
+                            <span class="mdc-button__label">Accept</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="mdc-dialog__scrim"></div>
+        </div>
+    </form>
+
+
+    <aside id="errorsSnackbar" class="mdc-snackbar" data-mdc-auto-init="MDCSnackbar"">
+        <div class="mdc-snackbar__surface" role="status" aria-relevant="additions">
+            <div class="mdc-snackbar__label" aria-atomic="false">
+                Something goes wrong!
+            </div>
+            <div class="mdc-snackbar__actions" aria-atomic="true">
+                <button type="button" class="mdc-button mdc-snackbar__action" data-mdc-auto-init="MDCRipple">
+                    <div class="mdc-button__ripple"></div>
+                    <span class="mdc-button__label">Dismiss</span>
+                </button>
+            </div>
+        </div>
+    </aside>
+{% endblock %}
+
+{% block special_scripts %}
+    <script src="/static/js/staff.js"></script>
+{% endblock %}

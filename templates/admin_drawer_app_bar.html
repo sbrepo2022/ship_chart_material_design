@@ -8,7 +8,8 @@
     <header class="mdc-top-app-bar">
         <div class="mdc-top-app-bar__row">
             <section class="mdc-top-app-bar__section mdc-top-app-bar__section--align-start">
-                <span class="mdc-top-app-bar__title"><a href="/" class="mdc-theme--on-primary">Ship Chart</a> | {{ title }}</span>
+                <a href="{{ url_for('index') }}" class="material-icons mdc-top-app-bar__navigation-icon mdc-icon-button">sailing</a>
+                <span class="mdc-top-app-bar__title"><a href="{{ url_for('index') }}" class="mdc-theme--on-primary">Ship Chart</a></span>
             </section>
             <section class="mdc-top-app-bar__section mdc-top-app-bar__section--align-end" role="toolbar">
                 {% if session['user_id'] %}
@@ -30,22 +31,22 @@
             <div class="mdc-drawer__content">
                 <h6 class="mdc-typography--headline6 m-3 mb-4">Pages</h6>
                 <nav class="mdc-list" data-mdc-auto-init="MDCList">
-                    <a class="mdc-deprecated-list-item {% if page == 'ships' %} mdc-deprecated-list-item--activated {% endif %}" data-mdc-auto-init="MDCRipple" href="{% if page != 'ships' %}/ships{% else %}#{% endif %}">
+                    <a class="mdc-deprecated-list-item {% if page == 'ships' %} mdc-deprecated-list-item--activated {% endif %}" data-mdc-auto-init="MDCRipple" href="{% if page != 'ships' %}{{ url_for('ships.index') }}{% else %}#{% endif %}">
                         <span class="mdc-deprecated-list-item__ripple"></span>
                         <i class="material-icons mdc-deprecated-list-item__graphic" aria-hidden="true">sailing</i>
                         <span class="mdc-deprecated-list-item__text">Ships</span>
                     </a>
-                    <a class="mdc-deprecated-list-item" data-mdc-auto-init="MDCRipple" href="#">
+                    <a class="mdc-deprecated-list-item {% if page == 'staff' %} mdc-deprecated-list-item--activated {% endif %}" data-mdc-auto-init="MDCRipple" href="{% if page != 'staff' %}{{ url_for('staff.index') }}{% else %}#{% endif %}">
                         <span class="mdc-deprecated-list-item__ripple"></span>
                         <i class="material-icons mdc-deprecated-list-item__graphic" aria-hidden="true">people</i>
                         <span class="mdc-deprecated-list-item__text">Staff</span>
                     </a>
-                    <a class="mdc-deprecated-list-item" data-mdc-auto-init="MDCRipple" href="#">
+                    <a class="mdc-deprecated-list-item {% if page == 'offloads' %} mdc-deprecated-list-item--activated {% endif %}" data-mdc-auto-init="MDCRipple" href="{% if page != 'offloads' %}{{ url_for('offloads.index') }}{% else %}#{% endif %}">
                         <span class="mdc-deprecated-list-item__ripple"></span>
                         <i class="material-icons mdc-deprecated-list-item__graphic" aria-hidden="true">local_shipping</i>
                         <span class="mdc-deprecated-list-item__text">Offloads</span>
                     </a>
-                    <a class="mdc-deprecated-list-item" data-mdc-auto-init="MDCRipple" href="#">
+                    <a class="mdc-deprecated-list-item {% if page == 'works' %} mdc-deprecated-list-item--activated {% endif %}" data-mdc-auto-init="MDCRipple" href="{% if page != 'works' %}{{ url_for('works.index') }}{% else %}#{% endif %}">
                         <span class="mdc-deprecated-list-item__ripple"></span>
                         <i class="material-icons mdc-deprecated-list-item__graphic" aria-hidden="true">work</i>
                         <span class="mdc-deprecated-list-item__text">Works</span>
@@ -60,7 +61,7 @@
             </div>
         </aside>
         <div class="drawer-content-inner">
-            <div class="overlay">
+            <div class="overlay overlay-custom">
                 {% block content %}
 
                 {% endblock %}

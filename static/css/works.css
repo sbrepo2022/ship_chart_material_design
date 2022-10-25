@@ -1,0 +1,29 @@
+.employee-placeholder-1 {
+    position: absolute;
+    background-color: whitesmoke;
+    left: 1rem; top: 16px;
+    height: 40px;
+    width: 40px;
+    border-radius: 40px;
+}
+
+.employee-placeholder-2 {
+    position: absolute;
+    background-color: whitesmoke;
+    left: calc(2rem + 40px); right: 50%; top: 16px;
+    height: 16px;
+    border-radius: 16px;
+}
+
+.employee-placeholder-3 {
+    position: absolute;
+    background-color: whitesmoke;
+    left: calc(2rem + 40px); right: 75%; bottom: 16px;
+    height: 14px;
+    border-radius: 14px;
+}
+
+.employee-choose-wrapper {
+    position: relative;
+    min-height: 72px;
+}

@@ -6,20 +6,26 @@
             {% for ship in ships %}
                 <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-3-desktop">
                     <div class="mdc-card">
-                        <div class="mdc-card__media mdc-card__media--16-9" style="background-image: url({{ ship[3] }})"></div>
+                        <div class="mdc-card__media mdc-card__media--16-9"
+                             {% if ship[3] != '' %}
+                                style="background-image: url({{ url_for('uploaded_file', filename=ship[3]) }})"
+                             {% else %}
+                                style="background-image: url({{ '/static/resources/images/ship_bg.jpg' }})"
+                             {% endif %}
+                        ></div>
                         <div class="mdc-card__content">
                             <div class="mdc-typography--headline6 mb-2">{{ ship[1] }}</div>
                             <div class="mdc-theme--text-secondary-on-light">{{ ship[2] }}</div>
                         </div>
                         <div class="mdc-card__actions">
                             <div class="mdc-card__action-buttons">
-                                <a href="#" class="mdc-button mdc-card__action mdc-card__action--button" data-mdc-auto-init="MDCRipple">
+                                <button type="button" role="edit-ship" class="mdc-button mdc-card__action mdc-card__action--button" data-mdc-auto-init="MDCRipple" data-ship-id="{{ ship[0] }}" data-ship-name="{{ ship[1] }}" data-port-id="{{ ship[4] }}" data-ship-image="{{ ship[3] }}">
                                     <div class="mdc-button__ripple"></div>
                                     <span class="mdc-button__label">Edit ship</span>
-                                </a>
+                                </button>
                             </div>
                             <div class="mdc-card__action-icons">
-                                <button class="material-icons mdc-icon-button mdc-card__action mdc-card__action--icon mdc-theme--primary" title="Delete ship" data-mdc-auto-init="MDCRipple">
+                                <button class="material-icons mdc-icon-button mdc-card__action mdc-card__action--icon mdc-theme--error" title="Delete ship" data-mdc-auto-init="MDCRipple" data-action="{{ url_for('ships.ship') }}" role="delete-ship" data-ship-id="{{ ship[0] }}">
                                     <div class="mdc-icon-button__ripple"></div>
                                     delete
                                 </button>
@@ -31,30 +37,30 @@
         </div>
     </div>
 
-    <button id="addShip" class="mdc-fab mdc-fab--extended fab-main" data-mdc-auto-init="MDCRipple">
+    <button id="addShip" type="button" class="mdc-fab mdc-fab--extended fab-main" data-mdc-auto-init="MDCRipple">
         <div class="mdc-fab__ripple"></div>
         <span class="material-icons mdc-fab__icon">add</span>
         <span class="mdc-fab__label">Add ship</span>
     </button>
 
-    <div id="shipDialog" class="mdc-dialog mdc-dialog--fullscreen">
-        <div class="mdc-dialog__container">
-            <div class="mdc-dialog__surface ships-dialog-surface overflow-none"
-                 role="dialog"
-                 aria-modal="true"
-                 aria-labelledby="ship-dialog-title"
-                 aria-describedby="ship-dialog-content">
-                <div class="mdc-dialog__header">
-                    <h2 class="mdc-dialog__title" id="ship-dialog-title">
-                        Full-Screen Dialog Title
-                    </h2>
-                    <button class="mdc-icon-button material-icons mdc-dialog__close" data-mdc-dialog-action="close">
-                        close
-                    </button>
-                </div>
-                <form id="shipForm" action="{{ url_for('ships.ship') }}">
-                    <div class="mdc-dialog__content overflow-none" id="ship-dialog-content">
-                        <input type="hidden" name="ship_id">
+    <form id="shipForm" action="{{ url_for('ships.ship') }}">
+        <div id="shipDialog" class="mdc-dialog mdc-dialog--fullscreen">
+            <div class="mdc-dialog__container">
+                <div class="mdc-dialog__surface app-dialog-surface overflow-none"
+                     role="dialog"
+                     aria-modal="true"
+                     aria-labelledby="ship-dialog-title"
+                     aria-describedby="ship-dialog-content">
+                    <div class="mdc-dialog__header">
+                        <h2 class="mdc-dialog__title" id="ship-dialog-title">
+                            Full-Screen Dialog Title
+                        </h2>
+                        <button type="button" class="mdc-icon-button material-icons mdc-dialog__close" data-mdc-dialog-action="close">
+                            close
+                        </button>
+                    </div>
+                    <div class="mdc-dialog__content overflow-auto" id="ship-dialog-content">
+                        <input id="shipIdInput" type="hidden" name="ship-id">
                         <div class="card-img-preview ratio-16-9 mb-5">
                             <div id="shipImgDisplay" class="ratio-inner" style="background-image: url('/static/resources/images/ship_bg.jpg')">
                                 <button id="chooseShipImg" type="button" class="mdc-fab mdc-fab--extended fab-context" data-mdc-auto-init="MDCRipple">
@@ -65,23 +71,24 @@
                             </div>
                         </div>
                         <input id="shipImgInput" class="d-none" type="file" name="ship-image">
-                        <label class="mdc-text-field mdc-text-field--filled mdc-text-field--with-leading-icon w-100 mb-4" data-mdc-auto-init="MDCTextField">
+                        <label id="shipNameComponent" class="mdc-text-field mdc-text-field--filled mdc-text-field--with-leading-icon w-100 mb-4" data-mdc-auto-init="MDCTextField">
                             <i class="material-icons mdc-text-field__icon mdc-text-field__icon--leading">sailing</i>
                             <span class="mdc-text-field__ripple"></span>
                             <span class="mdc-floating-label" id="login-label-id">Ship name</span>
-                            <input class="mdc-text-field__input" type="text" aria-labelledby="login-label-id" name="ship_name">
+                            <input class="mdc-text-field__input" id="shipNameInput" type="text" aria-labelledby="login-label-id" name="ship-name">
                             <span class="mdc-line-ripple"></span>
                         </label>
-                        <div class="mdc-select mdc-select--filled w-100" data-mdc-auto-init="MDCSelect">
+                        <div id="portSelect" class="mdc-select mdc-select--filled w-100">
+                            <input id="portIdInput" type="hidden" name="port-id">
                             <div class="mdc-select__anchor"
                                  role="button"
                                  aria-haspopup="listbox"
                                  aria-expanded="false"
-                                 aria-labelledby="demo-label demo-selected-text">
+                                 aria-labelledby="port-label port-selected-text">
                                 <span class="mdc-select__ripple"></span>
-                                <span id="demo-label" class="mdc-floating-label">Ship port</span>
+                                <span id="port-label" class="mdc-floating-label">Ship port</span>
                                 <span class="mdc-select__selected-text-container">
-                                    <span id="demo-selected-text" class="mdc-select__selected-text"></span>
+                                    <span id="port-selected-text" class="mdc-select__selected-text"></span>
                                 </span>
                                 <span class="mdc-select__dropdown-icon">
                                     <svg class="mdc-select__dropdown-icon-graphic" viewBox="7 10 10 5" focusable="false">
@@ -104,9 +111,7 @@
 
                             <div id="portSelectMenu" class="mdc-select__menu mdc-menu mdc-menu-surface mdc-menu-surface--fullwidth">
                                 <ul class="mdc-deprecated-list" role="listbox" aria-label="Ports picker">
-                                    <li class="mdc-deprecated-list-item mdc-deprecated-list-item--selected" aria-selected="true" data-value="" role="option">
-                                        <span class="mdc-deprecated-list-item__ripple"></span>
-                                    </li>
+
                                 </ul>
                             </div>
                         </div>
@@ -121,11 +126,25 @@
                             <span class="mdc-button__label">Accept</span>
                         </button>
                     </div>
-                </form>
+                </div>
+            </div>
+            <div class="mdc-dialog__scrim"></div>
+        </div>
+    </form>
+
+    <aside id="errorsSnackbar" class="mdc-snackbar" data-mdc-auto-init="MDCSnackbar"">
+        <div class="mdc-snackbar__surface" role="status" aria-relevant="additions">
+            <div class="mdc-snackbar__label" aria-atomic="false">
+                Something goes wrong!
+            </div>
+            <div class="mdc-snackbar__actions" aria-atomic="true">
+                <button type="button" class="mdc-button mdc-snackbar__action" data-mdc-auto-init="MDCRipple">
+                    <div class="mdc-button__ripple"></div>
+                    <span class="mdc-button__label">Dismiss</span>
+                </button>
             </div>
         </div>
-        <div class="mdc-dialog__scrim"></div>
-    </div>
+    </aside>
 {% endblock %}
 
 {% block special_scripts %}

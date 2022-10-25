@@ -1,0 +1,481 @@
+{% extends 'admin_drawer_app_bar.html' %}
+
+{% block special_styles %}
+    <link rel="stylesheet" href="/static/css/drawer_app_bar.css">
+    <link rel="stylesheet" href="/static/css/offloads.css">
+{% endblock %}
+
+{% block content %}
+    <div class="toolbar-content-wrapper">
+        <div class="toolbar-content">
+            <button id="addOffload" class="material-icons mdc-icon-button mdc-theme--primary" title="Add offload" data-mdc-auto-init="MDCRipple">
+                <div class="mdc-icon-button__ripple"></div>
+                add
+            </button>
+            <button id="applyOffloads" class="material-icons mdc-icon-button mdc-theme--primary" title="Apply offloads" data-mdc-auto-init="MDCRipple">
+                <div class="mdc-icon-button__ripple"></div>
+                move_to_inbox
+            </button>
+            <button id="deleteOffloads" class="material-icons mdc-icon-button mdc-theme--error" title="Delete offloads" data-mdc-auto-init="MDCRipple">
+                <div class="mdc-icon-button__ripple"></div>
+                delete
+            </button>
+        </div>
+        <div id="offloadsTable" class="app-data-table" data-limit="{{ limit }}" data-offset="{{ offset }}" data-count="{{ count }}">
+            <div class="mdc-data-table mdc-data-table--sticky-header mh-100 w-100" data-mdc-auto-init="MDCDataTable">
+                <div class="mdc-data-table__table-container">
+                    <table class="mdc-data-table__table" aria-label="Offloads table">
+                        <thead>
+                            <tr class="mdc-data-table__header-row">
+                                <th class="mdc-data-table__header-cell mdc-data-table__header-cell--checkbox" role="columnheader" scope="col">
+                                    <div class="mdc-checkbox mdc-data-table__header-row-checkbox mdc-checkbox--selected">
+                                        <input type="checkbox" class="mdc-checkbox__native-control" aria-label="Toggle all rows"/>
+                                        <div class="mdc-checkbox__background">
+                                            <svg class="mdc-checkbox__checkmark" viewBox="0 0 24 24">
+                                                <path class="mdc-checkbox__checkmark-path" fill="none" d="M1.73,12.91 8.1,19.28 22.79,4.59" />
+                                            </svg>
+                                            <div class="mdc-checkbox__mixedmark"></div>
+                                        </div>
+                                        <div class="mdc-checkbox__ripple"></div>
+                                    </div>
+                                </th>
+                                {% for cell in t_head %}
+                                    <th class="mdc-data-table__header-cell" role="columnheader" scope="col">{{ cell }}</th>
+                                {% endfor %}
+                                <th class="mdc-data-table__header-cell" role="columnheader" scope="col"></th>
+                            </tr>
+                        </thead>
+                        <tbody class="mdc-data-table__content">
+                            {% for row in t_data %}
+                                <tr data-row-id="u{{ loop.index }}" class="mdc-data-table__row" role="offload-row" data-offload-id="{{ row[0] }}">
+                                    <td class="mdc-data-table__cell mdc-data-table__cell--checkbox">
+                                        <div class="mdc-checkbox mdc-data-table__row-checkbox">
+                                            <input type="checkbox" class="mdc-checkbox__native-control" aria-labelledby="u{{ loop.index }}"/>
+                                            <div class="mdc-checkbox__background">
+                                                <svg class="mdc-checkbox__checkmark" viewBox="0 0 24 24">
+                                                    <path class="mdc-checkbox__checkmark-path" fill="none" d="M1.73,12.91 8.1,19.28 22.79,4.59" />
+                                                </svg>
+                                                <div class="mdc-checkbox__mixedmark"></div>
+                                            </div>
+                                            <div class="mdc-checkbox__ripple"></div>
+                                        </div>
+                                    </td>
+                                    {% set row_loop = loop %}
+                                    {% for cell in row %}
+                                        {% if loop.first %}
+                                            <th class="mdc-data-table__cell {% if row[4] == 1 %}mdc-theme--text-hint-on-background{% endif %}" scope="row" id="u{{ row_loop.index }}">{{ cell }}</th>
+                                        {% else %}
+                                            {% if loop.index == 3 and cell == None %}
+                                                <td class="mdc-data-table__cell mdc-theme--primary">Processing...</td>
+                                            {% else %}
+                                                {% if loop.index == 5 %}
+                                                    <td class="mdc-data-table__cell">
+                                                        <span class="material-icons mdc-theme--secondary">{% if cell == 1 %}done{% endif %}</span>
+                                                    </td>
+                                                {% else %}
+                                                    <td class="mdc-data-table__cell {% if row[4] == 1 %}mdc-theme--text-hint-on-background{% endif %}">{{ cell }}</td>
+                                                {% endif %}
+                                            {% endif %}
+                                        {% endif %}
+                                    {% endfor %}
+                                    <td class="mdc-data-table__cell">
+                                        <button class="material-icons mdc-icon-button {% if row[4] == 1 %}mdc-theme--text-hint-on-background{% else %}mdc-theme--primary{% endif %}" title="Edit offload" data-mdc-auto-init="MDCRipple" role="edit-offload" data-offload-id="{{ row[0] }}">
+                                            <div class="mdc-icon-button__ripple"></div>
+                                            edit
+                                        </button>
+                                        {% if not row[2] %}
+                                            <button class="material-icons mdc-icon-button mdc-theme--primary" title="Finish offload" data-mdc-auto-init="MDCRipple" role="finish-offload" data-offload-id="{{ row[0] }}">
+                                                <div class="mdc-icon-button__ripple"></div>
+                                                check_circle_outline
+                                            </button>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="mdc-data-table__pagination">
+                    <div class="mdc-data-table__pagination-trailing">
+                        <div class="mdc-data-table__pagination-rows-per-page">
+                            <div class="mdc-data-table__pagination-rows-per-page-label">
+                                Rows per page
+                            </div>
+
+                            <div id="offloadsLimitSelect" class="mdc-select mdc-select--outlined mdc-select--no-label mdc-data-table__pagination-rows-per-page-select" data-mdc-auto-init="MDCSelect">
+                                <div class="mdc-select__anchor" role="button" aria-haspopup="listbox"
+                                     aria-labelledby="demo-pagination-select" tabindex="0">
+                                    <span class="mdc-select__selected-text-container">
+                                        <span id="demo-pagination-select" class="mdc-select__selected-text"></span>
+                                    </span>
+                                    <span class="mdc-select__dropdown-icon">
+                                        <svg
+                                                class="mdc-select__dropdown-icon-graphic"
+                                                viewBox="7 10 10 5">
+                                            <polygon
+                                                    class="mdc-select__dropdown-icon-inactive"
+                                                    stroke="none"
+                                                    fill-rule="evenodd"
+                                                    points="7 10 12 15 17 10">
+                                            </polygon>
+                                            <polygon
+                                                    class="mdc-select__dropdown-icon-active"
+                                                    stroke="none"
+                                                    fill-rule="evenodd"
+                                                    points="7 15 12 10 17 15">
+                                            </polygon>
+                                        </svg>
+                                    </span>
+                                    <span class="mdc-notched-outline mdc-notched-outline--notched">
+                                        <span class="mdc-notched-outline__leading"></span>
+                                        <span class="mdc-notched-outline__trailing"></span>
+                                    </span>
+                                </div>
+
+                                <div class="mdc-select__menu mdc-menu mdc-menu-surface mdc-menu-surface--fullwidth" role="listbox">
+                                    <ul class="mdc-deprecated-list">
+                                        <li class="mdc-deprecated-list-item {% if limit == 10 %}mdc-deprecated-list-item--selected{% endif %}" {% if limit == 10 %}aria-selected="true"{% endif %} role="option" data-value="10">
+                                            <div class="mdc-deprecated-list-item__ripple"></div>
+                                            <span class="mdc-deprecated-list-item__text">10</span>
+                                        </li>
+                                        <li class="mdc-deprecated-list-item {% if limit == 25 %}mdc-deprecated-list-item--selected{% endif %}" {% if limit == 25 %}aria-selected="true"{% endif %} role="option" data-value="25">
+                                            <div class="mdc-deprecated-list-item__ripple"></div>
+                                            <span class="mdc-deprecated-list-item__text">25</span>
+                                        </li>
+                                        <li class="mdc-deprecated-list-item {% if limit == 100 %}mdc-deprecated-list-item--selected{% endif %}" {% if limit == 100 %}aria-selected="true"{% endif %} role="option" data-value="100">
+                                            <div class="mdc-deprecated-list-item__ripple"></div>
+                                            <span class="mdc-deprecated-list-item__text">100</span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mdc-data-table__pagination-navigation">
+                            <div class="mdc-data-table__pagination-total">
+                                {{ offset + 1 }}‑{{ count if offset + limit > count else offset + limit }} of {{ count }}
+                            </div>
+                            <button id="firstPageButton" class="mdc-icon-button material-icons mdc-data-table__pagination-button" data-first-page="true" data-mdc-auto-init="MDCRipple" {% if offset == 0 %}disabled{% endif %}>
+                                <div class="mdc-icon-button__ripple"></div>
+                                <div class="mdc-button__icon">first_page</div>
+                            </button>
+                            <button id="prevPageButton" class="mdc-icon-button material-icons mdc-data-table__pagination-button" data-prev-page="true" data-mdc-auto-init="MDCRipple" {% if offset == 0 %}disabled{% endif %}>
+                                <div class="mdc-icon-button__ripple"></div>
+                                <div class="mdc-button__icon">chevron_left</div>
+                            </button>
+                            <button id="nextPageButton" class="mdc-icon-button material-icons mdc-data-table__pagination-button" data-next-page="true" data-mdc-auto-init="MDCRipple" {% if offset + limit >= count %}disabled{% endif %}>
+                                <div class="mdc-icon-button__ripple"></div>
+                                <div class="mdc-button__icon">chevron_right</div>
+                            </button>
+                            <button id="lastPageButton" class="mdc-icon-button material-icons mdc-data-table__pagination-button" data-last-page="true" data-mdc-auto-init="MDCRipple" {% if offset + limit >= count %}disabled{% endif %}>
+                                <div class="mdc-icon-button__ripple"></div>
+                                <div class="mdc-button__icon">last_page</div>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <form id="offloadForm" action="{{ url_for('offloads.offload') }}">
+        <div id="offloadDialog" class="mdc-dialog mdc-dialog--fullscreen">
+            <div class="mdc-dialog__container">
+                <div class="mdc-dialog__surface app-dialog-surface overflow-none"
+                     role="dialog"
+                     aria-modal="true"
+                     aria-labelledby="offload-dialog-title"
+                     aria-describedby="offload-dialog-content">
+                    <div class="mdc-dialog__header">
+                        <h2 class="mdc-dialog__title" id="offload-dialog-title">
+                            Full-Screen Dialog Title
+                        </h2>
+                        <button type="button" class="mdc-icon-button material-icons mdc-dialog__close" data-mdc-dialog-action="close">
+                            close
+                        </button>
+                    </div>
+                    <div class="mdc-dialog__content overflow-auto" id="offload-dialog-content">
+                        <input id="offloadIdInput" type="hidden" name="offload-id">
+                        <input id="shipIdInput" type="hidden" name="ship-id">
+                        <div class="d-flex flex-align-center mb-4">
+                            <label id="entryDateComponent" class="mdc-text-field mdc-text-field--filled mdc-text-field--with-leading-icon flex-grow-1" data-mdc-auto-init="MDCTextField">
+                                <i class="material-icons mdc-text-field__icon mdc-text-field__icon--leading">event</i>
+                                <span class="mdc-text-field__ripple"></span>
+                                <span class="mdc-floating-label" id="entry-date-label-id">Entry date</span>
+                                <input class="mdc-text-field__input" id="entryDateInput" type="date" name="entry-date" required>
+                                <span class="mdc-line-ripple"></span>
+                            </label>
+                            <label id="entryTimeComponent" class="mdc-text-field mdc-text-field--filled mdc-text-field--with-leading-icon flex-grow-1 ml-4" data-mdc-auto-init="MDCTextField">
+                                <i class="material-icons mdc-text-field__icon mdc-text-field__icon--leading">schedule</i>
+                                <span class="mdc-text-field__ripple"></span>
+                                <span class="mdc-floating-label" id="entry-time-label-id">Entry time</span>
+                                <input class="mdc-text-field__input" id="entryTimeInput" type="time" name="entry-time" required>
+                                <span class="mdc-line-ripple"></span>
+                            </label>
+                            <button type="button" role="entry-now" class="mdc-button mdc-button--raised ml-4" data-mdc-auto-init="MDCRipple">
+                                <div class="mdc-button__ripple"></div>
+                                <span class="mdc-button__label">Now</span>
+                            </button>
+                        </div>
+                        <div class="mb-2 mdc-typography--body1">
+                            Offload ship
+                        </div>
+                        <div class="d-flex flex-align-center mb-4">
+                            <div id="chooseShipView" class="ship-choose-wrapper flex-grow-1">
+                                <div class="ship-placeholder-1"></div>
+                                <div class="ship-placeholder-2"></div>
+                                <div class="ship-placeholder-3"></div>
+                            </div>
+                            <button type="button" role="choose-ship" class="mdc-button mdc-button--icon-leading ml-4" data-mdc-auto-init="MDCRipple">
+                                <i class="material-icons mdc-text-field__icon mdc-button__icon">sailing</i>
+                                <div class="mdc-button__ripple"></div>
+                                <span class="mdc-button__label">Choose ship</span>
+                            </button>
+                        </div>
+                        <div class="d-flex">
+                            <div class="mb-2 mdc-typography--body1 flex-grow-1">
+                                Offload employees
+                            </div>
+                            <button type="button" role="add-offload-employee" class="mdc-button mdc-button--icon-leading" data-mdc-auto-init="MDCRipple">
+                                <i class="material-icons mdc-text-field__icon mdc-button__icon">add</i>
+                                <div class="mdc-button__ripple"></div>
+                                <span class="mdc-button__label">Add employee</span>
+                            </button>
+                        </div>
+                        <ul id="offloadEmployeesList" class="mdc-deprecated-list mdc-deprecated-list--two-line mdc-deprecated-list--avatar-list" data-mdc-auto-init="MDCList">
+                        </ul>
+                    </div>
+                    <div class="mdc-dialog__actions">
+                        <button type="button" class="mdc-button mdc-dialog__button" data-mdc-dialog-action="cancel" data-mdc-auto-init="MDCRipple">
+                            <div class="mdc-button__ripple"></div>
+                            <span class="mdc-button__label">Cancel</span>
+                        </button>
+                        <button type="submit" class="mdc-button mdc-dialog__button" data-mdc-auto-init="MDCRipple">
+                            <div class="mdc-button__ripple"></div>
+                            <span class="mdc-button__label">Accept</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="mdc-dialog__scrim"></div>
+        </div>
+    </form>
+
+    <div id="chooseShipDialog" class="mdc-dialog">
+        <div class="mdc-dialog__container">
+            <div class="mdc-dialog__surface small-dialog-surface overflow-none"
+                 role="dialog"
+                 aria-modal="true"
+                 aria-labelledby="choose-ship-dialog-title"
+                 aria-describedby="choose-ship-dialog-content">
+                <h2 class="mdc-dialog__title" id="choose-ship-dialog-title">
+                    Choose ship
+                </h2>
+                <div class="mdc-dialog__content overflow-auto" id="choose-ship-dialog-content">
+                    <ul class="mdc-deprecated-list mdc-deprecated-list--two-line mdc-deprecated-list--avatar-list" data-mdc-auto-init="MDCList">
+                        {% for ship in ships %}
+                            <li class="mdc-deprecated-list-item" tabindex="0" data-mdc-auto-init="MDCRipple"
+                                role="choose-ship-elem"
+                                data-ship-id="{{ ship[0] }}"
+                                data-ship-name="{{ ship[1] }}"
+                                data-port-name="{{ ship[2] }}"
+                                data-img-url="{{ ship[3] }}"
+                            >
+                                <span class="mdc-deprecated-list-item__ripple"></span>
+                                <span class="mdc-deprecated-list-item__graphic material-icons"
+                                    {% if ship[3] != '' %}
+                                        style="background-size: cover; background-image: url({{ url_for('uploaded_file', filename=ship[3]) }})"
+                                    {% endif %}
+                                    {% if ship[3] == '' %}
+                                        style="background-size: cover; background-image: url('/static/resources/images/ship_bg.jpg')"
+                                    {% endif %}
+                                >
+                                </span>
+                                <span class="mdc-deprecated-list-item__text">
+                                    <span class="mdc-deprecated-list-item__primary-text">{{ ship[1] }}</span>
+                                    <span class="mdc-deprecated-list-item__secondary-text">{{ ship[2] }}</span>
+                                </span>
+                            </li>
+                            {% if not loop.last %}
+                                <li role="separator" class="mdc-deprecated-list-divider mdc-deprecated-list-divider--padding"></li>
+                            {% endif %}
+                        {% endfor %}
+                    </ul>
+                </div>
+                <div class="mdc-dialog__actions">
+                    <button type="button" class="mdc-button mdc-dialog__button" data-mdc-dialog-action="cancel" data-mdc-auto-init="MDCRipple">
+                        <div class="mdc-button__ripple"></div>
+                        <span class="mdc-button__label">Cancel</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="mdc-dialog__scrim"></div>
+    </div>
+
+    <form id="addOffloadEmployeeForm">
+        <div id="addOffloadEmployeeDialog" class="mdc-dialog">
+            <div class="mdc-dialog__container">
+                <div class="mdc-dialog__surface small-dialog-surface overflow-none"
+                     role="dialog"
+                     aria-modal="true"
+                     aria-labelledby="add-offload-employee-dialog-title"
+                     aria-describedby="add-offload-employee-dialog-content">
+                    <h2 class="mdc-dialog__title" id="add-offload-employee-dialog-title">
+                        Add offload employee
+                    </h2>
+                    <div class="mdc-dialog__content overflow-auto" id="add-offload-employee-dialog-content">
+                        <ul class="mdc-deprecated-list mdc-deprecated-list--two-line mdc-deprecated-list--avatar-list mb-4" role="radiogroup" data-mdc-auto-init="MDCList">
+                            {% for employee in employees %}
+                                <li class="mdc-deprecated-list-item" role="radio" aria-checked="false" tabindex="0" data-mdc-auto-init="MDCRipple"
+                                    data-employee-id="{{ employee[0] }}"
+                                    data-employee-firstname="{{ employee[1] }}"
+                                    data-employee-midname="{{ employee[2] }}"
+                                    data-employee-lastname="{{ employee[3] }}"
+                                    data-employee-birthday="{{ employee[4] }}"
+                                    data-employee-admission="{{ employee[5] }}"
+                                    data-employee-dismission="{{ employee[6] }}"
+                                    data-department-id="{{ employee[7] }}"
+                                    data-img-url="{{ employee[8] }}"
+                                >
+                                    <span class="mdc-deprecated-list-item__ripple"></span>
+                                    <span class="mdc-deprecated-list-item__graphic material-icons"
+                                        {% if employee[8] != '' %}
+                                            style="background-size: cover; background-image: url({{ url_for('uploaded_file', filename=employee[8]) }})"
+                                        {% endif %}
+                                        {% if employee[8] == '' %}
+                                            style="background-size: cover; background-image: url('/static/resources/icons/account_circle.svg')"
+                                        {% endif %}
+                                    >
+                                    </span>
+                                    <span class="mdc-deprecated-list-item__text">
+                                        <span class="mdc-deprecated-list-item__primary-text">{{ employee[1] }} {{ employee[2] }} {{ employee[3] }}</span>
+                                        <span class="mdc-deprecated-list-item__secondary-text">Department #{{ employee[7] }}</span>
+                                    </span>
+                                    <span class="mdc-deprecated-list-item__meta">
+                                        <span class="mdc-list-item__graphic">
+                                            <div class="mdc-radio">
+                                                <input class="mdc-radio__native-control"
+                                                type="radio"
+                                                name="offload-employee-radio"
+                                                value="{{ employee[0] }}" required>
+                                                <div class="mdc-radio__background">
+                                                    <div class="mdc-radio__outer-circle"></div>
+                                                    <div class="mdc-radio__inner-circle"></div>
+                                                </div>
+                                            </div>
+                                        </span>
+                                    </span>
+                                </li>
+                                {% if not loop.last %}
+                                    <li role="separator" class="mdc-deprecated-list-divider mdc-deprecated-list-divider--padding"></li>
+                                {% endif %}
+                            {% endfor %}
+                        </ul>
+                        <div class="d-flex">
+                            <label id="employeeOffloadDateComponent" class="mdc-text-field mdc-text-field--filled mdc-text-field--with-leading-icon flex-grow-1" data-mdc-auto-init="MDCTextField">
+                                <i class="material-icons mdc-text-field__icon mdc-text-field__icon--leading">event</i>
+                                <span class="mdc-text-field__ripple"></span>
+                                <span class="mdc-floating-label" id="employee-offload-date-label-id">Activity date</span>
+                                <input class="mdc-text-field__input" id="employeeOffloadDateInput" type="date" name="employee-offload-date" required>
+                                <span class="mdc-line-ripple"></span>
+                            </label>
+                            <label id="workHoursComponent" class="mdc-text-field mdc-text-field--filled mdc-text-field--with-leading-icon ml-4" data-mdc-auto-init="MDCTextField">
+                                <i class="material-icons mdc-text-field__icon mdc-text-field__icon--leading">schedule</i>
+                                <span class="mdc-text-field__ripple"></span>
+                                <span class="mdc-floating-label" id="work-hours-label-id">Work hours</span>
+                                <input class="mdc-text-field__input" id="workHoursInput" type="number" name="work-hours" required>
+                                <span class="mdc-line-ripple"></span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="mdc-dialog__actions">
+                        <button type="button" class="mdc-button mdc-dialog__button" data-mdc-dialog-action="cancel" data-mdc-auto-init="MDCRipple">
+                            <div class="mdc-button__ripple"></div>
+                            <span class="mdc-button__label">Cancel</span>
+                        </button>
+                        <button type="submit" class="mdc-button mdc-dialog__button" data-mdc-auto-init="MDCRipple">
+                            <div class="mdc-button__ripple"></div>
+                            <span class="mdc-button__label">Accept</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="mdc-dialog__scrim"></div>
+        </div>
+    </form>
+
+    <form id="exitOffloadForm" action="{{ url_for('offloads.finish') }}" method="post">
+        <div id="exitOffloadDialog" class="mdc-dialog mdc-dialog--fullscreen">
+            <div class="mdc-dialog__container">
+                <div class="mdc-dialog__surface app-dialog-surface overflow-none"
+                     role="dialog"
+                     aria-modal="true"
+                     aria-labelledby="exit-offload-dialog-title"
+                     aria-describedby="exit-offload-dialog-content">
+                    <div class="mdc-dialog__header">
+                        <h2 class="mdc-dialog__title" id="exit-offload-dialog-title">
+                            Finish offload
+                        </h2>
+                        <button type="button" class="mdc-icon-button material-icons mdc-dialog__close" data-mdc-dialog-action="close">
+                            close
+                        </button>
+                    </div>
+                    <div class="mdc-dialog__content overflow-auto" id="exit-offload-dialog-content">
+                        <input id="offloadExitIdInput" type="hidden" name="offload-id">
+                        <div class="d-flex flex-align-center mb-4">
+                            <label id="exitDateComponent" class="mdc-text-field mdc-text-field--filled mdc-text-field--with-leading-icon flex-grow-1" data-mdc-auto-init="MDCTextField">
+                                <i class="material-icons mdc-text-field__icon mdc-text-field__icon--leading">event</i>
+                                <span class="mdc-text-field__ripple"></span>
+                                <span class="mdc-floating-label" id="exit-date-label-id">Exit date</span>
+                                <input class="mdc-text-field__input" id="exitDateInput" type="date" name="exit-date" required>
+                                <span class="mdc-line-ripple"></span>
+                            </label>
+                            <label id="exitTimeComponent" class="mdc-text-field mdc-text-field--filled mdc-text-field--with-leading-icon flex-grow-1 ml-4" data-mdc-auto-init="MDCTextField">
+                                <i class="material-icons mdc-text-field__icon mdc-text-field__icon--leading">schedule</i>
+                                <span class="mdc-text-field__ripple"></span>
+                                <span class="mdc-floating-label" id="exit-time-label-id">Exit time</span>
+                                <input class="mdc-text-field__input" id="exitTimeInput" type="time" name="exit-time" required>
+                                <span class="mdc-line-ripple"></span>
+                            </label>
+                            <button type="button" role="exit-now" class="mdc-button mdc-button--raised ml-4" data-mdc-auto-init="MDCRipple">
+                                <div class="mdc-button__ripple"></div>
+                                <span class="mdc-button__label">Now</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="mdc-dialog__actions">
+                        <button type="button" class="mdc-button mdc-dialog__button" data-mdc-dialog-action="cancel" data-mdc-auto-init="MDCRipple">
+                            <div class="mdc-button__ripple"></div>
+                            <span class="mdc-button__label">Cancel</span>
+                        </button>
+                        <button type="submit" class="mdc-button mdc-dialog__button" data-mdc-auto-init="MDCRipple">
+                            <div class="mdc-button__ripple"></div>
+                            <span class="mdc-button__label">Accept</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="mdc-dialog__scrim"></div>
+        </div>
+    </form>
+
+    <aside id="errorsSnackbar" class="mdc-snackbar" data-mdc-auto-init="MDCSnackbar">
+        <div class="mdc-snackbar__surface" role="status" aria-relevant="additions">
+            <div class="mdc-snackbar__label" aria-atomic="false">
+                Something goes wrong!
+            </div>
+            <div class="mdc-snackbar__actions" aria-atomic="true">
+                <button type="button" class="mdc-button mdc-snackbar__action" data-mdc-auto-init="MDCRipple">
+                    <div class="mdc-button__ripple"></div>
+                    <span class="mdc-button__label">Dismiss</span>
+                </button>
+            </div>
+        </div>
+    </aside>
+{% endblock %}
+
+{% block special_scripts %}
+    <script src="/static/js/offloads.js"></script>
+{% endblock %}
